@@ -14,8 +14,8 @@ https://processing.org/download/
 >- Chat ✔
 >- Animated player move ✖
 >- Chat commands ✖
->- Map editor ✘
->- Player build ⨉
->- Registration 🗙
->- Collision ✘
->- Server configurations ✘
+>- Map editor ✖
+>- Player build ✖
+>- Registration ✖
+>- Collision ✖
+>- Server configurations ✖
