@@ -2,5 +2,5 @@ Where i can download Processing ?
 
 https://processing.org/download/
 
-![alt text](https://processing.org/img/processing3-logo.png)
+![alt text](https://raw.githubusercontent.com/GeorgeSikora/PIXEL-MMORPG/master/screenshots/inGame.png)
 
