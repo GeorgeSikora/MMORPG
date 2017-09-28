@@ -12,10 +12,10 @@ https://processing.org/download/
 >- Textures ✔
 >- Menu ✔
 >- Chat ✔
->- Animated player move ✘
->- Chat commands ✘
+>- Animated player move ✖
+>- Chat commands ✖
 >- Map editor ✘
->- Player build ✘
->- Registration ✘
+>- Player build ⨉
+>- Registration 🗙
 >- Collision ✘
 >- Server configurations ✘
