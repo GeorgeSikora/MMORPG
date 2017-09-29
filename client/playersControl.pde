@@ -10,8 +10,8 @@ class Player {
   } 
   void draw() { 
     fill(60);
-    ellipse(x,y,20,20);
+    ellipse(x, y, 20, 20);
     fill(255);
-    text(name,x,y-15);
-  } 
+    text(name, x, y-15);
+  }
 }

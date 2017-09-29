@@ -70,8 +70,7 @@ public class TEXTBOX {
       if (selected) {
         if (KEYCODE == (int)BACKSPACE) {
           BACKSPACE();
-        }// else if (KEYCODE == 32) {
-
+        }
         if (cisla) {
           boolean isKeyNumber = (KEY >= '0' && KEY <= '9');
 

@@ -2,8 +2,9 @@ import oscP5.*;
 import netP5.*;
 OscP5 oscP5tcpClient;
 OscMessage m;
+
 boolean click, chat;
-int left, right, up, down; // Směr stisknuté klávesy hráče
+int left, right, up, down;
 String myName;
 String input;
 int line = 0;
@@ -25,8 +26,6 @@ boolean showId = false;
 String chatStr = "";
 boolean menu;
 int linesLength = 0;
-int wievX = width/2;
-int wievY = height/2;
 
 void setup() {
   frameRate(60);
@@ -41,18 +40,17 @@ void setup() {
   textSize(25);
   tileset = loadImage("tiles.png");
   tile = new PImage[tileset.width/16*tileset.height/16];
+
+  //** cut the tiles **\\
   int x = 0, y = 0;
   for (int i = 0; i < tile.length; i++) {
     tile[i] = tileset.get(x*16, y*16, 16, 16);
-    println(x + " & " + y);
     x++;
     if (x >= tileset.width/16) {
       x=0;
       y++;
     }
   }
-  wievX = width/2;
-  wievY = height/2;
 }
 
 
@@ -105,20 +103,10 @@ void draw() {
     Oy1=camY-myY;
     Oy2=camY+height-myY;
     ortho(Ox1, Ox2, Oy1, Oy2);
-    send(myId + " " + myX + " " + myY + " " + myName);
-    /* for (int i = tiles.size()-1; i >= 0; i--) {
-     if (tiles.get(i).x+wievX+32 >= myX && tiles.get(i).x-wievX <= myX && tiles.get(i).y+wievY+32 >= myY && tiles.get(i).y-wievY <= myY) {
-     Tile tile = tiles.get(i);
-     tile.draw();
-     }
-     }*/
-    /*
-    noFill();
-     stroke(255, 0, 0);
-     rect(myX, myY, wievX*2, wievY*2);
-     stroke(255, 255, 0);
-     rect(myX, myY, wievX*2+64, wievY*2+64);
-     */
+
+    send(myId + " " + myX + " " + myY + " " + myName); // send my data for server
+    int wievX = width/2;
+    int wievY = height/2;
     for (int i = tiles.size()-1; i >= 0; i--) {
       if (tiles.get(i).x+wievX+32 >= myX && tiles.get(i).x-wievX <= myX && tiles.get(i).y+wievY+32 >= myY && tiles.get(i).y-wievY <= myY) {
         Tile tile = tiles.get(i);
@@ -175,17 +163,17 @@ void send(String message) {
 }
 
 void oscEvent(OscMessage theMessage) {
-  //println(theMessage.addrPattern());
   input = theMessage.addrPattern();
   data = split(input, ' ');
   if (data[0].equals("m")) {
-    println(data[1]);////////
-    pridatInformaci(data[1]);
+    // if (data[0].equals(myName)) {
+    //} else {
+    pridatInformaci(data[2]);
+    //}
   }
   if (room == 1) {
-    //println(theMessage.addrPattern());
     if (data.length>3) {
-      boolean nasel = false;
+      boolean nasel = false; // nasel[CZ] = he groaned[EN]
       for (int i = 0; i < playerList.size(); i++) {
         if (playerList.get(i).equals(data[0])) {
           nasel = true;
@@ -214,11 +202,11 @@ void oscEvent(OscMessage theMessage) {
       }
     }
   }
-  if (room==0 && data[1].equals(myName)) {
-    if (data[0].equals("x")) {
+  if (room==0 && data[1].equals(myName)) { // While my name is called..
+    if (data[0].equals("x")) { // Player with myName is exist :(
       connect = false;
     }
-    if (data[0].equals("a")) {
+    if (data[0].equals("a")) { // Player with myName doesnt exist :)
       myId = int(data[2]);
       room = 1;
       connect=true;
