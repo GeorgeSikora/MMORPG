@@ -3,6 +3,7 @@ import netP5.*;
 OscP5 oscP5tcpServer;
 NetAddress myServerAddress;
 String[] data;
+int zW = width, zH = height;
 StringList takenId, playerList;
 String input;
 ArrayList<TEXTBOX> textboxes = new ArrayList<TEXTBOX>();
@@ -11,20 +12,31 @@ float camX=0, camY=0;
 float  Ox1, Ox2, Oy1, Oy2;
 int room;
 boolean click;
+int speed = 5;
+int line = 0;
+
+
 
 void setup() {
   size(450, 255, P3D);
   takenId = new StringList();
+  tiles = new ArrayList<Tile>();
   playerList = new StringList();
   players = new ArrayList<Player>();
-  oscP5tcpServer = new OscP5(this, 25577, OscP5.TCP);
+  oscP5tcpServer = new OscP5(this, 29992, OscP5.TCP);
   nastaveniTlacitek();
+  cutTiles();
 }
 
 void send(String message) {
   oscP5tcpServer.send(message, new Object[] {new Integer(1)});
 }
-
+void mouseWheel(MouseEvent event) {
+  float e = event.getCount();
+  if(e==1){zW+=width/100;zH+=height/100;}
+  if(e==-1){zW-=width/100;zH-=height/100;}
+  println(zW + " " + zH);
+}
 void draw() {
   background(20);
   if (room == 0) {
@@ -41,33 +53,70 @@ void draw() {
         t.selected = false;
       }
     }
+    drawButtonRect("Hrát", 295, 190, true);
+    if (click) {
+      room=2;
+      thread( "nagenerovatMapu" );
+      //nagenerovatMapu();
+    }
   }
   if (room == 1) {
-    if (mousePressed) {
-      if (width/2-width/5 < mouseX) {
-        camX++;
-      }
-      if (width/2+width/5 > mouseX) {
-        camX--;
-      }
-      if (height/2-height/5 < mouseY) {
-        camY--;
-      }
-      if (height/2+height/5 > mouseY) {
-        camY++;
+    int myY = -int(camY);//-zH/2
+    int myX = int(camX);
+    int wievX = width+zW;
+    int wievY = height+zH;
+    for (int i = tiles.size()-1; i >= 0; i--) {
+      if (tiles.get(i).x+wievX+32 >= myX && tiles.get(i).x-wievX <= myX && tiles.get(i).y+wievY+32 >= myY && tiles.get(i).y-wievY <= myY) {
+        Tile tile = tiles.get(i);
+        tile.draw();
+        if (mousePressed) {
+          if (tile.x < mouseX+myX-width/2 && tile.y < mouseY+myY-height/2 && tile.x+32 > mouseX+myX-width/2 && tile.y+32 > mouseY+myY-height/2) {
+            //tiles.remove(i);
+            //tile.id = selectedTile;
+          }
+        }
       }
     }
-    Ox1=camX-width+0;
-    Ox2=camX+0;
-    Oy1=camY-0;
-    Oy2=camY+height-0;
+    if (mousePressed) {
+      if (width/2-width/5 < mouseX) {
+        camX+=speed;
+      }
+      if (width/2+width/5 > mouseX) {
+        camX-=speed;
+      }
+      if (height/2-height/5 < mouseY) {
+        camY-=speed;
+      }
+      if (height/2+height/5 > mouseY) {
+        camY+=speed;
+      }
+    }
+    int w = zW;
+    int h = zH;
+    Ox1=camX-w+0;
+    Ox2=camX+w;
+    Oy1=camY-h;
+    Oy2=camY+h-0;
     ortho(Ox1, Ox2, Oy1, Oy2);
-
-    // println(takenId + " > " + playerList);
+    fill(125);
+    rectMode(CORNERS);
+    //rect(-250*32,-250*32,500*32,500*32);
     for (int i = players.size()-1; i >= 0; i--) {
       Player player = players.get(i);
       player.draw();
     }
+  }
+  if (room==2) {
+    background(20);
+    rectMode(CORNER);
+    float load = map(line, 0, linesLength, 0, 100);
+    float loadBar = map(int(load), 0, 100, 0, width/2);
+    fill(0);
+    rect(width/4, height/3, width/2, 20); 
+    fill(0, 125, 125);
+    rect(width/4, height/3, int(loadBar), 20);
+    text(int(load) + "% loading map...", width/2, height/2);
+    println(load);
   }
 }
 
@@ -76,12 +125,6 @@ void oscEvent(OscMessage theMessage) {
   input = theMessage.addrPattern();
   println(theMessage.addrPattern());
   data = split(theMessage.addrPattern(), ' ');
-
-  //send("20 20 20 AAAAAA\n");
-  /* if(data[0]!=""){
-   send("20 20 20 AAAAAA\n");
-   }*/
-  //send("xxxxxxxxxxxxxx" + "\n");
   if (data.length>3) {
     boolean nasel = false;
     for (int i = 0; i < playerList.size(); i++) {
@@ -109,14 +152,8 @@ void oscEvent(OscMessage theMessage) {
       }
     }
   }
-  /*if (data[0].equals("m")) {
-   exit();
-   if(data[1].equals("help")){
-   send("m OK OK :) :D");
-   send("m watafak ?");
-   send("m JIRKA !!!");
-   }
-   }*/
+  if (data[0].equals("m")) {}
+  
   if (data[0].equals("n")) {
     println("!!!");
     boolean free = true;

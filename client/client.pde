@@ -2,11 +2,12 @@ import oscP5.*;
 import netP5.*;
 OscP5 oscP5tcpClient;
 OscMessage m;
-
+int globalMX, globalMY;  //vycentrování kurzoru myši
 boolean click, chat;
 int left, right, up, down;
 String myName;
 String input;
+String myIP;
 int line = 0;
 String data[];
 int x, y, myX = 100, myY = 100;
@@ -14,6 +15,7 @@ int id, myId = int(random(100));
 StringList playerList;
 boolean connect =false, serverConnect =false;
 int room;
+String IP;
 ArrayList<TEXTBOX> textboxes = new ArrayList<TEXTBOX>();
 int speed = 2;
 float camX=0, camY=0;
@@ -25,8 +27,9 @@ boolean goLeft = true, goRight = true, goDown = true, goUp = true;
 boolean showId = false;
 String chatStr = "";
 boolean menu;
+float Grotation=0;
 int linesLength = 0;
-
+int selectedTile = 0;
 void setup() {
   frameRate(60);
   size(450, 255, P3D);
@@ -40,7 +43,7 @@ void setup() {
   textSize(25);
   tileset = loadImage("tiles.png");
   tile = new PImage[tileset.width/16*tileset.height/16];
-
+  bullets = new ArrayList<Bullet>();
   //** cut the tiles **\\
   int x = 0, y = 0;
   for (int i = 0; i < tile.length; i++) {
@@ -52,7 +55,23 @@ void setup() {
     }
   }
 }
-
+void mouseMoved() {
+  globalMX=int(camX+mouseX*0.5); //přepočet na střed kurzoru
+  globalMY=int(camY+mouseY*0.5);
+}
+void mouseWheel(MouseEvent event) {
+  float e = event.getCount();
+  if (selectedTile>0) {
+    if (e ==  1) {
+      selectedTile--;
+    }
+  }
+  if (selectedTile<tile.length-1) {
+    if (e == -1) {
+      selectedTile++;
+    }
+  }
+}
 
 void draw() {
   if (room == 0) {
@@ -79,7 +98,8 @@ void draw() {
     if (click) {
       room = 2;
       if (!serverConnect) {
-        String IP = textboxes.get(1).Text;
+        IP = textboxes.get(1).Text;
+        myIP = IP;
         int PORT = int(textboxes.get(2).Text);
         oscP5tcpClient = new OscP5(this, IP, PORT, OscP5.TCP);
         serverConnect = true;
@@ -91,6 +111,8 @@ void draw() {
         connect = true;
       }
     }
+    //text(selectedTile,25,25);
+    //image(tile[selectedTile],100,100,64,64);
   }
   if (room == 1) {
     background(20);
@@ -111,6 +133,13 @@ void draw() {
       if (tiles.get(i).x+wievX+32 >= myX && tiles.get(i).x-wievX <= myX && tiles.get(i).y+wievY+32 >= myY && tiles.get(i).y-wievY <= myY) {
         Tile tile = tiles.get(i);
         tile.draw();
+        if (mousePressed) {
+          if (tile.x < mouseX+myX-width/2 && tile.y < mouseY+myY-height/2 && tile.x+32 > mouseX+myX-width/2 && tile.y+32 > mouseY+myY-height/2) {
+            //tiles.remove(i);
+            selectedTile = tile.id;
+            //tile.id = selectedTile;
+          }
+        }
       }
     }
     for (int i = players.size()-1; i >= 0; i--) {
@@ -142,7 +171,25 @@ void draw() {
     }
     fill(255);
     vykresleniInformaci();
+    fill(20);
+    rect(-width/2+3, -height/2+3,68,68);
+    image(tile[selectedTile],-width/2+5, -height/2+5,64,64);
+    
+  /*for (i = players.size()-1; i >= 0; i--) {
+   //you need a seperate var to get the object from the bullets arraylist then use that variable to call the functions
+   Player player = players.get(i);
+   player.update();
+   player.render();
+   }*/
+  // ---* POHYB A NAČTENÍ HRÁČE *-- \\
+  Grotation = atan2(mouseY-height/2, mouseX-width/2); //Calculate the angle btw mouse & center
     popMatrix();
+    for (int i = bullets.size()-1; i >= 0; i--) {
+    //you need a seperate var to get the object from the bullets arraylist then use that variable to call the functions
+    Bullet bullet = bullets.get(i);
+    bullet.update();
+    bullet.render();
+  }
   }
   if (room==2) {
     background(20);
@@ -154,7 +201,7 @@ void draw() {
     fill(0, 125, 125);
     rect(width/4, height/3, int(loadBar), 20);
     text(int(load) + "% loading map...", width/2, height/2);
-    println(load);
+    println(myIP);
   }
 }
 
@@ -336,5 +383,8 @@ void mousePressed() {
     if (t.status) {
       t.PRESSED(mouseX, mouseY);
     }
+  }
+  if(room == 1 ){
+  bullets.add( new Bullet(Grotation, new PVector(globalMX, globalMY)));
   }
 }

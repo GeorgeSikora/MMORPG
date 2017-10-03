@@ -9,9 +9,11 @@ class Player {
     name = name_;
   } 
   void draw() { 
-    fill(60);
+    noStroke();
+    fill(0,125,125);
     ellipse(x,y,20,20);
     fill(255);
-    text(name,x,y-15);
+    text(name,x,y-37);
+    text(id,x,y-19);
   } 
 }

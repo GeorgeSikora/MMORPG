@@ -1,6 +1,7 @@
 String[] lines;
 void nagenerovatMapu() {
-  lines = loadStrings("map.qmap");
+  //lines = loadStrings(myIP + "/map.qmap");
+  lines = loadStrings("http://"+ IP +"/map.qmap");
   linesLength = lines.length;
   for (line = 0; line < lines.length; line ++) {
     String[] pieces = split(lines[line], ' ');
