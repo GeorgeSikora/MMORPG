@@ -1,6 +1,10 @@
-**Where i can download Processing ?**
+**⟨⟨⟨ MMORPG GAME ⟩⟩⟩**
 
-https://processing.org/download/
+Start: 28.9.2017
+
+**⟨⟨⟨ VERSIONS ⟩⟩⟩**
+
+v0.0.1 ALPHA
 
 ![inMenu](https://raw.githubusercontent.com/GeorgeSikora/PIXEL-MMORPG/master/screenshots/inMenu.png)
 ![inGame](https://raw.githubusercontent.com/GeorgeSikora/PIXEL-MMORPG/master/screenshots/inGame.png)
@@ -19,3 +23,7 @@ https://processing.org/download/
 >- Registration ✖
 >- Collision ✖
 >- Server configurations ✖
+
+**Where i can download Processing ?**
+
+https://processing.org/download/
